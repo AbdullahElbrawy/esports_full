@@ -168,6 +168,7 @@ vite-admin/
    │  └─ globals.d.ts
    ├─ utils/
    │  ├─ cn.ts
+   |  ├─ error_boundary.tsx
    │  ├─ date.ts
    │  └─ format.ts
    └─ __mocks__/                       // MSW dev mocks (optional)
