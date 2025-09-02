@@ -5,6 +5,7 @@ import App from "./App.tsx";
 import ErrorBoundaryComponent from "../utils/error_boundary.tsx";
 import { useNavigate } from "react-router-dom";
 import { SidebarContext } from "./providers/sidebarContext.tsx";
+import ThemeContext from "./providers/themContext.tsx";
 
 const navigate = useNavigate();
 
@@ -14,9 +15,11 @@ const Root: React.FC = () => {
       fallBack="something error"
       onError={() => navigate("/")}
     >
+      <ThemeContext>
       <SidebarContext>
         <App />
       </SidebarContext>
+      </ThemeContext>
     </ErrorBoundaryComponent>
   );
 };

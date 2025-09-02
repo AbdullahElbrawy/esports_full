@@ -1,0 +1,30 @@
+
+const paths = {
+    root:'/',
+    login:'/login',
+    dashboard:'/dashboard',
+    matches:{
+      root:'/matches',
+      add:'/matches/add',
+      update:'/matches/update'
+    },
+    ranks:{
+      root:'/ranks',
+      add:'/ranks/add',
+      update:'/ranks/update'
+    },
+    ranks:{
+      root:'/channels',
+      add:'/channels/add',
+      update:'/channels/update'
+    },
+    blogs:{
+      root:'/blogs',
+      add:'/blogs/add',
+      update:'/blogs/update'
+    },
+    ussers:{
+      root:'/users',
+      update:'users/update'
+    }
+}
