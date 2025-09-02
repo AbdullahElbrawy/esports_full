@@ -141,42 +141,24 @@ The high-level tree (details omitted for brevity):
 
 ```
 vite-admin/
-├─ .editorconfig
-├─ .env.example
-├─ .eslintignore
-├─ .eslintrc.cjs
-├─ .gitignore
-├─ .prettierignore
-├─ .prettierrc
-├─ index.html
-├─ package.json
-├─ postcss.config.cjs
-├─ tailwind.config.ts
-├─ tsconfig.json
-├─ tsconfig.paths.json
-├─ vite.config.ts
-├─ public/
+├─ public/                           # static assets
 │  ├─ favicon.ico
-│  ├─ site.webmanifest
 │  ├─ robots.txt
 │  └─ og-image.png
-├─ docs/                       # optional: ADRs, design notes, API docs
+├─ docs/                             # ADRs, API contracts, UX notes
 │  ├─ ADR-0001-auth.md
-│  └─ API-contracts.md
-├─ .github/
-│  └─ workflows/
-│     └─ ci.yml
-├─ scripts/                    # optional dev scripts/scaffolding
-│  ├─ generate-component.mjs
+│  ├─ ADR-0002-roles-rbac.md
+│  ├─ API-contracts.md
+│  └─ UX-content-map.md
+├─ .github/workflows/ci.yml
+├─ scripts/                          # scaffolding/dev utilities
+│  ├─ gen-feature.mjs
 │  └─ sync-env.mjs
-├─ tests/                      # test root (unit + e2e config)
-│  ├─ unit/
-│  └─ e2e/
 └─ src/
    ├─ app/
-   │  ├─ App.tsx               # (thin wrapper)
-   │  ├─ main.tsx              # entry bootstrap
-   │  ├─ providers/
+   │  ├─ main.tsx
+   │  ├─ App.tsx
+   │  ├─ providers/                 # global context providers
    │  │  ├─ QueryProvider.tsx
    │  │  ├─ StoreProvider.tsx
    │  │  ├─ ThemeProvider.tsx
@@ -192,157 +174,154 @@ vite-admin/
    │        ├─ RootLayout.tsx
    │        ├─ AuthLayout.tsx
    │        └─ DashboardLayout.tsx
-   ├─ content/                 # central UI/UX copy & specs (no code)
-   │  └─ dashboard-content.ts  # page titles, sections, tables, forms, fixtures, toasts
-   ├─ api/                     # typed endpoints + react-query hooks
-   │  ├─ auth/
-   │  │  ├─ endpoints.ts
-   │  │  ├─ schemas.ts
-   │  │  └─ index.ts
-   │  ├─ users/
-   │  │  ├─ endpoints.ts
-   │  │  ├─ queries.ts
-   │  │  └─ index.ts
-   │  ├─ orders/
-   │  │  ├─ endpoints.ts
-   │  │  ├─ queries.ts
-   │  │  └─ index.ts
-   │  ├─ matches/
-   │  │  ├─ endpoints.ts
-   │  │  ├─ queries.ts
-   │  │  └─ index.ts
-   │  ├─ teams/
-   │  │  ├─ endpoints.ts
-   │  │  ├─ queries.ts
-   │  │  └─ index.ts
-   │  ├─ players/
-   │  │  ├─ endpoints.ts
-   │  │  ├─ queries.ts
-   │  │  └─ index.ts
-   │  ├─ streams/
-   │  │  ├─ endpoints.ts
-   │  │  ├─ queries.ts
-   │  │  └─ index.ts
-   │  ├─ analytics/
-   │  │  ├─ endpoints.ts
-   │  │  ├─ queries.ts
-   │  │  └─ index.ts
+   ├─ content/                       # single source of truth for UI copy/spec
+   │  └─ dashboard-content.ts        # pages, sections, tables, forms, fixtures, toasts
+   ├─ api/                           # typed client per domain (endpoints + queries + schemas)
+   │  ├─ auth/ {endpoints.ts, queries.ts?, schemas.ts, index.ts}
+   │  ├─ users/ {endpoints.ts, queries.ts, schemas.ts?, fixtures.ts, index.ts}
+   │  ├─ matches/ {endpoints.ts, queries.ts, schemas.ts, fixtures.ts, index.ts}
+   │  ├─ teams/   { ... }
+   │  ├─ players/ { ... }
+   │  ├─ streams/ { ... }
+   │  ├─ analytics/ { ... }
+   │  ├─ notifications/ {endpoints.ts, queries.ts, index.ts}
+   │  ├─ admin/
+   │  │  ├─ cms/                     # content-admin APIs
+   │  │  │  ├─ teams.ts
+   │  │  │  ├─ players.ts
+   │  │  │  └─ matches.ts
+   │  │  ├─ moderation.ts
+   │  │  ├─ users.ts                 # role/ban/suspend
+   │  │  ├─ flags.ts                 # feature flags
+   │  │  ├─ webhooks.ts
+   │  │  ├─ audit.ts
+   │  │  ├─ search.ts                # search index stats/reindex
+   │  │  └─ push.ts                  # FCM topics/devices
+   │  ├─ billing/ {subscriptions.ts, invoices.ts, payment-methods.ts}
    │  └─ index.ts
-   ├─ assets/
-   │  ├─ fonts/
-   │  └─ images/
+   ├─ assets/ {fonts/, images/}
    ├─ components/
-   │  ├─ common/               # shell & shared compositional blocks
+   │  ├─ common/                     # shell & composite blocks
    │  │  ├─ Navbar.tsx
    │  │  ├─ Sidebar.tsx
-   │  │  ├─ PageHeader.tsx
    │  │  ├─ Breadcrumbs.tsx
+   │  │  ├─ PageHeader.tsx
    │  │  ├─ CommandK.tsx
-   │  │  └─ ThemeToggle.tsx
-   │  └─ ui/                   # primitives (design system)
-   │     ├─ Button.tsx
-   │     ├─ Input.tsx
-   │     ├─ Select.tsx
-   │     ├─ Checkbox.tsx
-   │     ├─ Dialog.tsx
-   │     ├─ Tooltip.tsx
-   │     ├─ Tabs.tsx
-   │     ├─ Toast.tsx
-   │     ├─ Card.tsx
-   │     ├─ Spinner.tsx
+   │  │  ├─ ThemeToggle.tsx
+   │  │  ├─ FilterBar.tsx            # chips, selects, reset
+   │  │  └─ EmptyState.tsx
+   │  └─ ui/                         # primitives
+   │     ├─ Button.tsx, Input.tsx, Select.tsx, Checkbox.tsx, Switch.tsx
+   │     ├─ Tabs.tsx, Dialog.tsx, Drawer.tsx, Tooltip.tsx, Toast.tsx
+   │     ├─ Card.tsx, Badge.tsx, Avatar.tsx, Progress.tsx, Skeleton.tsx
    │     └─ Table/
    │        ├─ DataTable.tsx
+   │        ├─ Toolbar.tsx           # search input, density, export
    │        └─ types.ts
-   ├─ features/                # screen-level domains (pages/components/hooks)
+   ├─ features/                      # domain modules (deeper split)
    │  ├─ auth/
    │  │  ├─ pages/LoginPage.tsx
+   │  │  ├─ pages/LogoutPage.tsx
    │  │  ├─ components/LoginForm.tsx
+   │  │  ├─ components/TwoFactorSetup.tsx
    │  │  ├─ hooks/useAuth.ts
    │  │  └─ types.ts
-   │  ├─ users/
-   │  │  ├─ pages/UsersListPage.tsx
-   │  │  ├─ pages/UserDetailPage.tsx
-   │  │  ├─ components/UserTable.tsx
-   │  │  ├─ components/UserForm.tsx
-   │  │  ├─ hooks/useUserForm.ts
-   │  │  └─ types.ts
-   │  ├─ orders/
-   │  │  ├─ pages/OrdersListPage.tsx
-   │  │  ├─ components/OrdersTable.tsx
-   │  │  └─ types.ts
+   │  ├─ dashboard/
+   │  │  ├─ pages/DashboardHome.tsx
+   │  │  ├─ sections/Upcoming.tsx
+   │  │  ├─ sections/RecentActivity.tsx
+   │  │  └─ sections/Recommendations.tsx
+   │  ├─ discover/
+   │  │  ├─ pages/DiscoverPage.tsx
+   │  │  ├─ components/DiscoverCard.tsx
+   │  │  └─ components/DiscoverFilters.tsx
    │  ├─ matches/
    │  │  ├─ pages/MatchesListPage.tsx
    │  │  ├─ pages/MatchDetailPage.tsx
    │  │  ├─ components/MatchesTable.tsx
    │  │  ├─ components/MatchFilters.tsx
-   │  │  └─ types.ts
-   │  ├─ teams/
-   │  │  ├─ pages/TeamsListPage.tsx
-   │  │  ├─ pages/TeamDetailPage.tsx
-   │  │  ├─ components/TeamsTable.tsx
-   │  │  └─ types.ts
-   │  ├─ players/
-   │  │  ├─ pages/PlayersListPage.tsx
-   │  │  ├─ pages/PlayerDetailPage.tsx
-   │  │  ├─ components/PlayersTable.tsx
-   │  │  └─ types.ts
+   │  │  ├─ components/Timeline.tsx
+   │  │  └─ components/Lineups.tsx
    │  ├─ streams/
    │  │  ├─ pages/StreamPage.tsx
    │  │  ├─ pages/VodPage.tsx
    │  │  ├─ components/HLSPlayer.tsx
-   │  │  └─ types.ts
+   │  │  ├─ components/LiveBadge.tsx
+   │  │  ├─ components/ChatPanel.tsx
+   │  │  └─ components/PollsPanel.tsx
+   │  ├─ teams/
+   │  │  ├─ pages/TeamsListPage.tsx
+   │  │  ├─ pages/TeamDetailPage.tsx
+   │  │  ├─ components/TeamsTable.tsx
+   │  │  ├─ components/RosterGrid.tsx
+   │  │  └─ components/ScheduleTable.tsx
+   │  ├─ players/
+   │  │  ├─ pages/PlayersListPage.tsx
+   │  │  ├─ pages/PlayerDetailPage.tsx
+   │  │  └─ components/PlayersTable.tsx
    │  ├─ analytics/
    │  │  ├─ pages/AnalyticsMePage.tsx
    │  │  ├─ pages/AnalyticsTeamsPage.tsx
-   │  │  └─ components/MetricTiles.tsx
+   │  │  ├─ components/MetricTiles.tsx
+   │  │  └─ components/Charts.tsx
    │  ├─ notifications/
-   │  │  └─ pages/NotificationsPage.tsx
-   │  └─ settings/
-   │     ├─ pages/ProfilePage.tsx
-   │     ├─ pages/SecurityPage.tsx
-   │     ├─ pages/AccountsPage.tsx
-   │     ├─ pages/PreferencesPage.tsx
-   │     ├─ pages/NotificationsPrefsPage.tsx
-   │     ├─ pages/ApiKeysPage.tsx
-   │     └─ pages/DevicesPage.tsx
-   ├─ screens/                 # multi-feature compositions
+   │  │  ├─ pages/NotificationsPage.tsx
+   │  │  └─ components/NotificationItem.tsx
+   │  ├─ settings/
+   │  │  ├─ pages/ProfilePage.tsx
+   │  │  ├─ pages/SecurityPage.tsx
+   │  │  ├─ pages/AccountsPage.tsx
+   │  │  ├─ pages/PreferencesPage.tsx
+   │  │  ├─ pages/NotificationsPrefsPage.tsx
+   │  │  ├─ pages/ApiKeysPage.tsx
+   │  │  └─ pages/DevicesPage.tsx
+   │  └─ admin/                    # full admin suite
+   │     ├─ pages/AdminHome.tsx
+   │     ├─ cms/
+   │     │  ├─ pages/TeamsCMSPage.tsx
+   │     │  ├─ pages/PlayersCMSPage.tsx
+   │     │  ├─ pages/MatchesCMSPage.tsx
+   │     │  ├─ components/TeamForm.tsx
+   │     │  ├─ components/PlayerForm.tsx
+   │     │  └─ components/MatchForm.tsx
+   │     ├─ moderation/
+   │     │  ├─ pages/ModerationPage.tsx
+   │     │  ├─ components/ModerationQueue.tsx
+   │     │  └─ components/ModerationDetail.tsx
+   │     ├─ users/
+   │     │  ├─ pages/UsersAdminPage.tsx
+   │     │  └─ components/RoleEditor.tsx
+   │     ├─ announcements/
+   │     │  ├─ pages/AnnouncementsPage.tsx
+   │     │  └─ components/AnnouncementEditor.tsx
+   │     ├─ flags/
+   │     │  ├─ pages/FeatureFlagsPage.tsx
+   │     │  └─ components/FlagEditor.tsx
+   │     ├─ webhooks/
+   │     │  ├─ pages/WebhooksPage.tsx
+   │     │  └─ components/WebhookDetail.tsx
+   │     ├─ audit/
+   │     │  ├─ pages/AuditLogPage.tsx
+   │     │  └─ components/AuditTable.tsx
+   │     ├─ search/
+   │     │  └─ pages/SearchIndexPage.tsx
+   │     └─ push/
+   │        ├─ pages/PushControlPage.tsx
+   │        └─ components/TestPushForm.tsx
+   ├─ billing/                      # optional if billing in-dashboard
+   │  ├─ pages/BillingPage.tsx
+   │  ├─ components/PlanCard.tsx
+   │  ├─ components/InvoicesTable.tsx
+   │  └─ components/PaymentMethods.tsx
+   ├─ screens/                      # high-level page compositions
    │  ├─ DashboardScreen.tsx
    │  └─ SettingsScreen.tsx
-   ├─ hooks/
-   │  ├─ useDisclosure.ts
-   │  ├─ useMediaQuery.ts
-   │  └─ useDebounce.ts
-   ├─ lib/
-   │  ├─ axios.ts
-   │  ├─ env.ts
-   │  ├─ i18n.ts
-   │  ├─ storage.ts
-   │  ├─ permissions.ts
-   │  ├─ sentry.ts
-   │  └─ posthog.ts
-   ├─ store/
-   │  ├─ index.ts
-   │  ├─ hooks.ts
-   │  ├─ ui.slice.ts
-   │  ├─ auth.slice.ts
-   │  └─ (rtk-query)/api.ts     # optional if you adopt RTKQ
-   ├─ styles/
-   │  ├─ globals.css
-   │  └─ tailwind.css
-   ├─ types/
-   │  └─ globals.d.ts
-   ├─ utils/
-   │  ├─ cn.ts
-   │  ├─ error_boundary.tsx
-   │  ├─ date.ts
-   │  └─ format.ts
-   └─ __mocks__/               # MSW handlers for local dev
-      ├─ server.ts
-      └─ handlers/
-         ├─ auth.ts
-         ├─ users.ts
-         ├─ matches.ts
-         └─ streams.ts
+   ├─ hooks/ {useDisclosure.ts, useMediaQuery.ts, useDebounce.ts}
+   ├─ lib/   {axios.ts, env.ts, storage.ts, permissions.ts, sentry.ts, posthog.ts, i18n.ts}
+   ├─ store/ {index.ts, hooks.ts, ui.slice.ts, auth.slice.ts, (rtk-query)/api.ts}
+   ├─ styles/ {globals.css, tailwind.css}
+   ├─ utils/  {cn.ts, error_boundary.tsx, date.ts, format.ts}
+   └─ __mocks__/ {server.ts, handlers/{auth.ts, users.ts, matches.ts, streams.ts}}
 
 
 > Path aliases are configured via `tsconfig.paths.json` (`@/*` → `src/*`).

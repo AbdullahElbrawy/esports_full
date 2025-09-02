@@ -13,7 +13,7 @@ const paths = {
       add:'/ranks/add',
       update:'/ranks/update'
     },
-    ranks:{
+    channels:{
       root:'/channels',
       add:'/channels/add',
       update:'/channels/update'
